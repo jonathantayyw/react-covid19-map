@@ -110,3 +110,12 @@
 .legend-label-active {
     color: rgba(255, 255, 255, 1);
 }
+
+.footer {
+    top: 8px;
+    color: rgba(255, 255, 255, 1);
+    font-size: 12px;
+    left: 8px;
+    position: absolute;
+    z-index: 1;
+}

@@ -88,6 +88,8 @@ class App extends Component {
           fields={fields}
           query={query}
         />
+
+        <div className="footer">Data source: About-Corona.Net</div>
       </div>
     ) : null;
   }

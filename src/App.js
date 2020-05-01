@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
 
+import { coordinates } from './patch/country_coordinates'
 import Legend from "./components/Legend";
 import Map from "./components/Map";
 
@@ -31,7 +32,7 @@ class App extends Component {
         url: "https://corona-api.com/countries",
       });
 
-      // console.log("country data retrieved", response.data.data);
+      // console.table(response.data.data);
       const countries_data = this.processData(response.data.data);
 
       this.setState({
@@ -47,16 +48,27 @@ class App extends Component {
     let processed = [];
 
     for (const d of data) {
-      const obj = {
+      let obj = {
         name: d.name,
         code: d.code,
-        coordinates: d.coordinates,
         flag: `https://cdn.staticaly.com/gh/hjnilsson/country-flags/master/svg/${d.code.toLowerCase()}.svg`,
         updated_at: d.updated_at,
         confirmed: d.latest_data.confirmed,
         deaths: d.latest_data.deaths,
         recovered: d.latest_data.recovered,
       };
+
+    // Patch for countries' coordinates 
+      obj['coordinates'] = {
+        latitude:
+          coordinates.find(f => f.country_code === d.code) !== undefined
+            ? coordinates.find(f => f.country_code === d.code).latlng[0]
+            : 0,
+        longitude:
+          coordinates.find(f => f.country_code === d.code) !== undefined
+            ? coordinates.find(f => f.country_code === d.code).latlng[1]
+            : 0
+      }
 
       processed.push(obj);
     }

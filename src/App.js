@@ -7,8 +7,14 @@ import Map from "./components/Map";
 import "./App.css";
 
 const initialState = {
+  colors: [
+    "rgba(5, 155, 247, 0.7)",
+    "rgba(233,30,99,0.7)",
+    "rgba(53,211,156,0.7)",
+  ],
   countries_data: [],
   data_loaded: false,
+  fields: ["confirmed", "deaths", "recovered"],
   query: "confirmed",
 };
 class App extends Component {
@@ -65,13 +71,23 @@ class App extends Component {
   };
 
   render() {
-    const { countries_data, data_loaded, query } = this.state;
+    const { colors, countries_data, data_loaded, fields, query } = this.state;
 
     return data_loaded ? (
       <div className="root">
-        <Legend query={query} handleSelectLegend={this.handleSetQuery} />
+        <Legend
+          colors={colors}
+          fields={fields}
+          query={query}
+          handleSelectLegend={this.handleSetQuery}
+        />
 
-        <Map data={countries_data} query={query} />
+        <Map
+          colors={colors}
+          data={countries_data}
+          fields={fields}
+          query={query}
+        />
       </div>
     ) : null;
   }

@@ -1,22 +1,25 @@
 import React, { Component } from "react";
-import ReactMapGL, { Marker, Popup, NavigationControl } from "react-map-gl";
+import ReactMapGL, { Marker, NavigationControl } from "react-map-gl";
+
+import Tooltip from "./Tooltip";
 
 // Input your token here
 const TOKEN =
   "pk.eyJ1Ijoiam9udGF5eXciLCJhIjoiY2s4aXcwbnA0MGFqYjNscDZicm9haXA3cCJ9.rI3D6Y4ZETQnYukX9RCOow";
 
+const initialState = {
+  map_data: [],
+  tooltip: null,
+  viewport: {
+    width: "100%",
+    height: "100%",
+    latitude: 0,
+    longitude: 0,
+    zoom: 2,
+  },
+};
 class Map extends Component {
-  state = {
-    map_data: [],
-    tooltip: null,
-    viewport: {
-      width: "100%",
-      height: "100%",
-      latitude: 0,
-      longitude: 0,
-      zoom: 2,
-    },
-  };
+  state = initialState;
 
   componentDidMount() {
     this.prepareData();
@@ -30,7 +33,7 @@ class Map extends Component {
   }
 
   prepareData = () => {
-    const { data, query } = this.props;
+    const { colors, data, query } = this.props;
 
     const map_data = data.filter((f) => f[query] > 0);
     const counts = map_data.map((e) => e[query]);
@@ -51,16 +54,16 @@ class Map extends Component {
 
       switch (query) {
         case "confirmed":
-          d.color = "rgba(5, 155, 247, 0.7)";
+          d.color = colors[0];
           break;
         case "deaths":
-          d.color = "rgba(233,30,99,0.7)";
+          d.color = colors[1];
           break;
         case "recovered":
-          d.color = "rgba(53,211,156,0.7)";
+          d.color = colors[2];
           break;
         default:
-          d.color = "rgba(5, 155, 247, 0.7)";
+          d.color = colors[0];
       }
     }
 
@@ -69,11 +72,13 @@ class Map extends Component {
     });
   };
 
+  handleCloseTooltip = () => {
+    this.setState({ tooltip: null });
+  };
+
   render() {
     const { map_data, tooltip, viewport } = this.state;
-    const { query } = this.props;
-
-    const regex = /\B(?=(\d{3})+(?!\d))/g;
+    const { fields } = this.props;
 
     return (
       <ReactMapGL
@@ -102,30 +107,11 @@ class Map extends Component {
         })}
 
         {tooltip && (
-          <Popup
-            tipSize={0}
-            longitude={tooltip.coordinates.longitude}
-            latitude={tooltip.coordinates.latitude}
-            closeOnClick={false}
-            onClose={() => this.setState({ tooltip: null })}
-          >
-            <div className="map-tooltip">
-              <div className="map-tooltip-field">
-                <div
-                  className="map-tooltip-flag"
-                  style={{ backgroundImage: `url(${tooltip.flag})` }}
-                />
-                <div className="map-tooltip-header">{tooltip.name}</div>
-              </div>
-
-              <div className="map-tooltip-field">
-                <div className="map-tooltip-label">{query}:</div>
-                <div className="map-tooltip-value">
-                  {tooltip[query].toString().replace(regex, ",")}
-                </div>
-              </div>
-            </div>
-          </Popup>
+          <Tooltip
+            details={tooltip}
+            fields={fields}
+            handleCloseTooltip={this.handleCloseTooltip}
+          />
         )}
 
         <div className="map-nav">
